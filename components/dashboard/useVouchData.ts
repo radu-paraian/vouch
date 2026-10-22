@@ -65,7 +65,7 @@ export function useVouchData(demo: boolean): VouchData & { refetch: () => void }
       pendingIds.current.add(id);
       if (syncTimer.current) clearTimeout(syncTimer.current);
       syncTimer.current = setTimeout(() => {
-        const ids = [...pendingIds.current];
+        const ids = Array.from(pendingIds.current);
         pendingIds.current.clear();
         fetch("/api/sync", {
           method: "POST",
