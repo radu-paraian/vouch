@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: #0c0b09;
+  color: #f4efe4;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+::selection {
+  background: #d4a24c;
+  color: #0c0b09;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
+}

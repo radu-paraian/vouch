@@ -1,6 +1,12 @@
 .DS_Store
 .env
 .env.local
+.env.production
 .env*.local
+node_modules
+.next
+.vercel
+out
+*.tsbuildinfo
 .cognee/
 cognee/.sync-state.json
