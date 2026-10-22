@@ -39,18 +39,28 @@ def supabase_credentials():
     return url, key
 
 
-def member_text(member):
-    communities = _join(member.get("communities")) or "no listed communities"
-    skills = _join(member.get("skills")) or "none listed"
-    shipped = member.get("shipped_count")
+def member_text(row):
+    communities = _join(row.get("communities")) or "no listed communities"
+    skills = _join(row.get("skills")) or "none listed"
+    languages = _join(row.get("languages")) or "none listed"
+    shipped = row.get("shipped_count")
     shipped_text = "unknown" if shipped is None else str(shipped)
+    followers = row.get("followers")
+    speaker = row.get("is_speaker")
+    if speaker is None:
+        speaker = row.get("speaker")
     return (
-        f"{member.get('name') or 'Unknown'} (id {member.get('id')}) is in {communities}. "
-        f"Skills: {skills}. Looking for: {member.get('looking_for') or 'nothing specified'}. "
-        f"Events in the last 3 months: {member.get('events_last_3_months') or 0}. "
-        f"Happy to speak: {bool(member.get('speaker'))} on {member.get('talk_topic') or 'no topic'}. "
-        f"Built: {member.get('research_summary') or 'unknown'}. "
-        f"Shipped projects: {shipped_text}."
+        f"{row.get('name') or 'Unknown'} (id {row.get('id')}) "
+        f"from {row.get('source') or 'an unknown source'}. "
+        f"Handle: {row.get('handle') or 'none'}. GitHub: {row.get('github') or 'none'}. "
+        f"Profile: {row.get('source_url') or 'none'}. "
+        f"Communities: {communities}. Skills: {skills}. Languages: {languages}. "
+        f"Shipped projects: {shipped_text}. "
+        f"Followers: {'unknown' if followers is None else followers}. "
+        f"Last active: {row.get('last_active') or 'unknown'}. "
+        f"Happy to speak: {bool(speaker)}. "
+        f"Speaker evidence: {row.get('speaker_evidence') or 'none'}. "
+        f"Built: {row.get('summary') or 'unknown'}."
     )
 
 
@@ -103,15 +113,36 @@ def add_text(text, name):
         files={"data": (name, text, "text/plain")},
         timeout=120,
     )
+    if response.status_code == 409:
+        updated = _replace_existing(base, key, response.text, text)
+        return updated or {"status": "exists"}
     if response.status_code >= 400:
         raise SystemExit(f"Cognee /api/v1/add failed ({response.status_code}): {response.text[:300]}")
     return response.json() if response.content else {}
 
 
+def _replace_existing(base, key, error_text, text):
+    import httpx
+    import re
+
+    match = re.search(r"data_id[= ]([0-9a-f-]{36})", error_text)
+    if not match:
+        return None
+    response = httpx.patch(
+        base + "/api/v1/update",
+        headers={**_cognee_headers(key), "Content-Type": "application/json"},
+        json={"data_id": match.group(1), "data": text},
+        timeout=120,
+    )
+    if response.status_code >= 400:
+        return None
+    return response.json() if response.content else {"status": "updated"}
+
+
 def cognify():
     base, key = cognee_config()
     body = json.dumps({"datasets": [DATASET]}).encode()
-    return _cognee(base, "/api/v1/cognify", body, _cognee_headers(key, "application/json"))
+    return _cognee(base, "/api/v1/cognify", body, _cognee_headers(key, "application/json"), timeout=600)
 
 
 def search(question):
@@ -132,14 +163,14 @@ def _cognee_headers(key, content_type=None):
     return headers
 
 
-def _cognee(base, path, body, headers):
+def _cognee(base, path, body, headers, timeout=120):
     request = Request(base + path, data=body, headers=headers, method="POST")
     context = ssl.create_default_context()
     certs = "/etc/ssl/cert.pem"
     if os.path.exists(certs):
         context.load_verify_locations(certs)
     try:
-        with urlopen(request, timeout=120, context=context) as response:
+        with urlopen(request, timeout=timeout, context=context) as response:
             payload = response.read().decode()
             return json.loads(payload) if payload else {}
     except HTTPError as error:

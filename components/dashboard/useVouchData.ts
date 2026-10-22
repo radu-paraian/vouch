@@ -30,6 +30,8 @@ export function useVouchData(demo: boolean): VouchData & { refetch: () => void }
     lastEventAt: null,
   });
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingIds = useRef<Set<string>>(new Set());
 
   const fetchAll = useCallback(async () => {
     if (demo || !supabase) return;
@@ -59,9 +61,24 @@ export function useVouchData(demo: boolean): VouchData & { refetch: () => void }
     if (demo || !supabase) return;
     fetchAll();
     const client = supabase;
+    const queueSync = (id: string) => {
+      pendingIds.current.add(id);
+      if (syncTimer.current) clearTimeout(syncTimer.current);
+      syncTimer.current = setTimeout(() => {
+        const ids = [...pendingIds.current];
+        pendingIds.current.clear();
+        fetch("/api/sync", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids }),
+        }).catch(() => {});
+      }, 3000);
+    };
     const channel = client
       .channel("vouch-builders")
-      .on("postgres_changes", { event: "*", schema: "public", table: "builders" }, () => {
+      .on("postgres_changes", { event: "*", schema: "public", table: "builders" }, (payload) => {
+        const id = (payload.new as { id?: string } | undefined)?.id;
+        if (id) queueSync(id);
         setState((p) => ({ ...p, lastEventAt: Date.now() }));
         if (timer.current) clearTimeout(timer.current);
         timer.current = setTimeout(fetchAll, 600);
@@ -72,6 +89,7 @@ export function useVouchData(demo: boolean): VouchData & { refetch: () => void }
     return () => {
       clearInterval(poll);
       if (timer.current) clearTimeout(timer.current);
+      if (syncTimer.current) clearTimeout(syncTimer.current);
       client.removeChannel(channel);
     };
   }, [demo, fetchAll]);

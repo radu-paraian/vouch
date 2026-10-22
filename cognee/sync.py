@@ -1,4 +1,4 @@
-"""Pull opted-in members from Supabase into the Cognee dataset `vouch`.
+"""Pull scraped builders from Supabase into the Cognee dataset `vouch`.
 
 Run from the repo root every ~20 minutes:
 
@@ -20,7 +20,7 @@ def fetch_members():
 
     url, key = supabase_credentials()
     client = create_client(url, key)
-    response = client.table("members").select("*").eq("consent", True).execute()
+    response = client.table("builders").select("*").execute()
     return response.data or []
 
 
@@ -47,17 +47,20 @@ async def sync():
         changed.append((member_id, digest, text))
 
     if not changed:
-        print(f"no changes ({len(rows)} members)")
+        print(f"no changes ({len(rows)} builders)")
         return
 
-    for member_id, _digest, text in changed:
+    for index, (member_id, _digest, text) in enumerate(changed, start=1):
         add_text(text, f"{member_id}.txt")
+        if index == 1 or index % 10 == 0 or index == len(changed):
+            print(f"uploaded {index} of {len(changed)}", flush=True)
+    print("building the memory", flush=True)
     cognify()
 
     for member_id, digest, _text in changed:
         state[member_id] = digest
     save_state(state)
-    print(f"synced {len(changed)} of {len(rows)} members")
+    print(f"synced {len(changed)} of {len(rows)} builders")
 
 
 if __name__ == "__main__":
