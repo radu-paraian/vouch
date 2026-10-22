@@ -6,6 +6,7 @@ import { GemCard, IntroCard, SpeakerCard } from "./cards";
 import { instrumentSans, instrumentSerif } from "./fonts";
 import { GemIcon, IntroIcon, MicIcon } from "./icons";
 import { InvitesPanel } from "./InvitesPanel";
+import { AskBox } from "./AskBox";
 import { AnimatedNumber, EmptyState, SkeletonGrid, listVariants } from "./ui";
 import { useVouchData } from "./useVouchData";
 
@@ -17,7 +18,7 @@ const TABS: { id: TabId; Icon: ComponentType<{ size?: number }>; label: string; 
 ];
 const grid = "grid gap-[15px] grid-cols-1 md:grid-cols-2 xl:grid-cols-3";
 
-export default function Dashboard({ demo = false, initialTab = "gems" }: { demo?: boolean; initialTab?: TabId }) {
+export default function Dashboard({ demo = false, initialTab = "gems", initialQuestion = "" }: { demo?: boolean; initialTab?: TabId; initialQuestion?: string }) {
   const [tab, setTab] = useState<TabId>(initialTab);
   const d = useVouchData(demo);
   const counts: Record<TabId, number> = { gems: d.gems.length, intros: d.intros.length, speakers: d.speakers.length };
@@ -87,6 +88,8 @@ export default function Dashboard({ demo = false, initialTab = "gems" }: { demo?
               ))}
             </div>
           </section>
+
+          <AskBox initialQuestion={initialQuestion} />
 
           <nav className="flex items-center gap-[12px]" role="tablist">
             {TABS.map(({ id, Icon, label }) => (

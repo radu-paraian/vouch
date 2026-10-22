@@ -155,3 +155,12 @@
 .vouch .v-tag-sep { padding: 0 6px; opacity: .6; }
 .vouch button.v-btn-primary { cursor: pointer; background: none; padding: 0; font-family: inherit; }
 .vouch .v-btn-secondary { font-size: 12px; padding: 9px 14px; text-decoration: none; }
+
+/* Ask input (matches select style) */
+.vouch .v-input {
+  background: #fff; border: 1px solid var(--v-line); border-radius: 25px; padding: 10px 16px;
+  font-size: 14px; font-family: inherit; color: var(--v-ink);
+}
+.vouch .v-input::placeholder { color: #a7a7a7; }
+.vouch .v-input:focus { outline: none; border-color: var(--v-line-strong); }
+.vouch button.v-btn-primary:disabled { cursor: default; opacity: .85; }
