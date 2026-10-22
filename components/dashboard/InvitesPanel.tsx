@@ -31,10 +31,10 @@ export function InvitesPanel({ demo, refreshKey }: { demo: boolean; refreshKey: 
 
   return (
     <section className="flex flex-col gap-[15px]">
-      <div className="flex items-center gap-[14px]">
+      <div className="flex flex-wrap items-center gap-[10px] md:gap-[14px]">
         <p className="v-display text-[32px] leading-[1]">Invite to</p>
-        <div className="relative">
-          <select className="v-select min-w-[260px]" value={community} onChange={(e) => setCommunity(e.target.value)} aria-label="Community">
+        <div className="relative flex-1 min-w-0 md:flex-none">
+          <select className="v-select w-full md:w-auto md:min-w-[260px]" value={community} onChange={(e) => setCommunity(e.target.value)} aria-label="Community">
             <option value="">Choose a community</option>
             {COMMUNITIES.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>

@@ -36,7 +36,7 @@ export default function Dashboard({ demo = false, initialTab = "gems", initialQu
 
   return (
     <div className={`vouch ${instrumentSans.variable} ${instrumentSerif.variable}`}>
-      <div className="flex gap-[10px] p-[20px] min-h-screen">
+      <div className="flex gap-[10px] p-[8px] md:p-[20px] min-h-screen">
         <aside className="hidden md:flex flex-col w-[66px] shrink-0">
           <div className="v-shell p-[8px] sticky top-[20px] h-[calc(100vh-40px)]">
             <div className="v-rail flex flex-col items-center gap-[12px] py-[16px]">
@@ -51,7 +51,7 @@ export default function Dashboard({ demo = false, initialTab = "gems", initialQu
           </div>
         </aside>
 
-        <main className="v-panel flex-1 min-w-0 px-[30px] pt-[18px] pb-[20px] flex flex-col gap-[20px]">
+        <main className="v-panel flex-1 min-w-0 px-[14px] md:px-[30px] pt-[14px] md:pt-[18px] pb-[20px] flex flex-col gap-[16px] md:gap-[20px]">
           <header className="flex items-center justify-between gap-[16px]">
             <div className="flex items-baseline gap-[16px]">
               <h1 className="v-display text-[36px] leading-[1]">Vouch</h1>
@@ -65,14 +65,14 @@ export default function Dashboard({ demo = false, initialTab = "gems", initialQu
           </header>
 
           <section className="grid grid-cols-1 lg:grid-cols-[minmax(320px,1fr)_2fr] gap-[15px]">
-            <div className="v-outline relative overflow-hidden pl-[30px] pr-[20px] pt-[26px] pb-[20px] min-h-[180px]">
+            <div className="v-outline relative overflow-hidden pl-[20px] md:pl-[30px] pr-[20px] pt-[18px] md:pt-[26px] pb-[18px] md:pb-[20px] md:min-h-[180px]">
               <div className="flex items-baseline gap-[6px]">
-                <span className="text-[64px] leading-[1] tracking-[-0.02em]">
+                <span className="text-[48px] md:text-[64px] leading-[1] tracking-[-0.02em]">
                   {d.count === null ? <span className="v-skel inline-block w-[90px] h-[56px] align-middle" /> : <AnimatedNumber value={d.count} />}
                 </span>
                 <span className="text-[24px] v-muted">builders</span>
               </div>
-              <div className="absolute right-[20px] bottom-0 flex items-end gap-[5px]" aria-hidden>
+              <div className="absolute right-[20px] bottom-0 hidden md:flex items-end gap-[5px]" aria-hidden>
                 {[0.62, 1, 0.74].map((h, idx) => (
                   <motion.div key={idx} initial={{ height: 0 }} animate={{ height: 110 * h }} transition={{ delay: 0.2 + idx * 0.1, type: "spring", stiffness: 120, damping: 18 }}
                     className="w-[56px] rounded-t-[15px]"
@@ -81,12 +81,12 @@ export default function Dashboard({ demo = false, initialTab = "gems", initialQu
               </div>
             </div>
 
-            <div className="v-outline-15 p-[30px] grid grid-cols-3 gap-[24px]">
+            <div className="v-outline-15 p-[16px] md:p-[30px] grid grid-cols-3 gap-[10px] md:gap-[24px]">
               {TABS.map((t, idx) => (
-                <div key={t.id} className={`flex flex-col justify-between gap-[24px] ${idx > 0 ? "pl-[24px] border-l" : ""}`} style={{ borderColor: "var(--v-line)" }}>
-                  <div className="flex items-baseline gap-[4px]">
-                    <span className="text-[42px] leading-[1.1]">{d.loading ? "–" : <AnimatedNumber value={counts[t.id]} />}</span>
-                    <span className="text-[24px] v-muted">{t.unit}</span>
+                <div key={t.id} className={`min-w-0 flex flex-col justify-between gap-[12px] md:gap-[24px] ${idx > 0 ? "pl-[10px] md:pl-[24px] border-l" : ""}`} style={{ borderColor: "var(--v-line)" }}>
+                  <div className="flex flex-wrap items-baseline gap-x-[4px]">
+                    <span className="text-[28px] md:text-[42px] leading-[1.1]">{d.loading ? "–" : <AnimatedNumber value={counts[t.id]} />}</span>
+                    <span className="text-[14px] md:text-[24px] v-muted">{t.unit}</span>
                   </div>
                   <div className="flex flex-col gap-[6px]">
                     <div className="v-track">
@@ -101,7 +101,7 @@ export default function Dashboard({ demo = false, initialTab = "gems", initialQu
 
           <AskBox initialQuestion={initialQuestion} />
 
-          <nav className="flex items-center gap-[12px]" role="tablist">
+          <nav className="v-tabs flex items-center gap-[8px] md:gap-[12px]" role="tablist">
             {TABS.map(({ id, Icon, label }) => (
               <button key={id} role="tab" aria-selected={tab === id} data-active={tab === id} onClick={() => setTab(id)} className="v-tab">
                 {tab === id && <motion.span layoutId="v-tab-pill" className="v-tab-pill" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}

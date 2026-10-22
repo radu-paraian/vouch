@@ -69,7 +69,7 @@ function PersonCard({ b, n, unit, line, action }: { b: Builder | Invite; n?: num
         <Reason text={line} />
         <Tags items={b.communities} />
       </div>
-      <div className="flex justify-end items-center gap-[8px]">
+      <div className="flex flex-wrap justify-end items-center gap-[8px]">
         <SourceLink source={b.source} url={b.source_url} github={b.github} />
         {action}
       </div>
@@ -104,7 +104,7 @@ export function IntroCard({ i }: { i: Intro }) {
           <Avatar name={i.a_name} size={44} />
           <p className="text-[18px] font-medium leading-[1.1] truncate max-w-full">{i.a_name}</p>
         </div>
-        <span className="v-display text-[32px] v-muted">&harr;</span>
+        <span className="v-display text-[24px] md:text-[32px] v-muted">&harr;</span>
         <div className="flex flex-col items-center text-center gap-[8px] min-w-0">
           <Avatar name={i.b_name} size={44} />
           <p className="text-[18px] font-medium leading-[1.1] truncate max-w-full">{i.b_name}</p>
@@ -114,7 +114,7 @@ export function IntroCard({ i }: { i: Intro }) {
         <Reason text={i.why} />
         <Tags items={[...(i.a_communities ?? []).slice(0, 1), ...(i.b_communities ?? []).slice(0, 1)]} />
       </div>
-      <div className="flex justify-end items-center gap-[8px]">
+      <div className="flex flex-wrap justify-end items-center gap-[8px]">
         <SourceLink source={i.b_source} url={i.b_url} />
         <CopyButton label="Draft intro" text={introMessage(i)} />
       </div>
