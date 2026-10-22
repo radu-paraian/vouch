@@ -1,7 +1,7 @@
 "use client";
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
-import { useEffect } from "react";
-import { ArrowCircleIcon } from "./icons";
+import { useEffect, useState } from "react";
+import { ArrowCircleIcon, CheckIcon, CopyIcon } from "./icons";
 
 export function AnimatedNumber({ value }: { value: number }) {
   const mv = useMotionValue(0);
@@ -34,12 +34,55 @@ export function Reason({ text }: { text?: string | null }) {
   );
 }
 
-export function GithubLink({ handle }: { handle?: string | null }) {
-  if (!handle) return null;
+const SOURCE_LABEL: Record<string, string> = { github: "GitHub", devpost: "Devpost", hn: "HN", luma: "Luma" };
+export const sourceLabel = (source?: string | null) => SOURCE_LABEL[(source ?? "").toLowerCase()] ?? "Profile";
+
+/** Link to where we found the person, labelled by source. */
+export function SourceLink({ source, url, github }: { source?: string | null; url?: string | null; github?: string | null }) {
+  const href = url || (github ? `https://github.com/${cleanHandle(github)}` : null);
+  if (!href) return null;
   return (
-    <a className="v-btn-primary" href={`https://github.com/${cleanHandle(handle)}`} target="_blank" rel="noreferrer">
-      <span>GitHub <ArrowCircleIcon /></span>
+    <a className="v-btn-secondary" href={href} target="_blank" rel="noreferrer">
+      {sourceLabel(source)} <ArrowCircleIcon size={12} />
     </a>
+  );
+}
+
+/** Primary button that copies a ready message and briefly shows "Copied". */
+export function CopyButton({ label, text }: { label: string; text: string }) {
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    if (!copied) return;
+    const t = setTimeout(() => setCopied(false), 1600);
+    return () => clearTimeout(t);
+  }, [copied]);
+  const onClick = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); } finally { ta.remove(); }
+    }
+    setCopied(true);
+  };
+  return (
+    <button type="button" className="v-btn-primary" onClick={onClick} title={text} aria-live="polite">
+      <span>{copied ? <CheckIcon size={13} /> : <CopyIcon size={13} />}{copied ? "Copied" : label}</span>
+    </button>
+  );
+}
+
+/** Up to `max` small muted community tags. */
+export function Tags({ items, max = 2 }: { items?: (string | null | undefined)[] | null; max?: number }) {
+  const list = Array.from(new Set((items ?? []).filter((x): x is string => !!x && x.trim() !== ""))).slice(0, max);
+  if (list.length === 0) return null;
+  return (
+    <p className="v-tags" title={list.join(" · ")}>
+      {list.map((t, i) => (
+        <span key={t} className="v-tag">{i > 0 && <span className="v-tag-sep">·</span>}{t}</span>
+      ))}
+    </p>
   );
 }
 

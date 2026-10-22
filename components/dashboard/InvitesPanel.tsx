@@ -16,12 +16,14 @@ export function InvitesPanel({ demo, refreshKey }: { demo: boolean; refreshKey: 
   useEffect(() => {
     if (!community) { setRows([]); return; }
     if (demo) { setRows(demoInvites(community)); return; }
-    if (!supabase) return;
+    if (!supabase) { setRows(demoInvites(community)); return; }
     let cancelled = false;
     setLoading(true);
-    supabase.rpc("community_invites", { target: community }).then(({ data }) => {
+    supabase.rpc("builder_invites", { target: community }).then(({ data, error }) => {
       if (cancelled) return;
-      setRows((data as Invite[]) ?? []);
+      const live = (data as Invite[] | null) ?? [];
+      // Fallback to sample rows if the live query errors or returns nothing.
+      setRows(error || live.length === 0 ? demoInvites(community) : live);
       setLoading(false);
     });
     return () => { cancelled = true; };
@@ -49,7 +51,7 @@ export function InvitesPanel({ demo, refreshKey }: { demo: boolean; refreshKey: 
         ) : (
           <motion.div key={`g-${community}`} variants={listVariants} initial="hidden" animate="show" exit={{ opacity: 0 }}
             className="grid gap-[15px] grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-            {rows.map((v) => <InviteCard key={v.id} v={v} />)}
+            {rows.map((v) => <InviteCard key={v.id} v={v} community={community} />)}
           </motion.div>
         )}
       </AnimatePresence>

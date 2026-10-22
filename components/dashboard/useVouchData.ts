@@ -12,60 +12,57 @@ export type VouchData = {
   loading: boolean;
   error: string | null;
   live: boolean;
+  /** True when sample data is shown (?demo=1, no Supabase, query error, or zero rows). */
+  fallback: boolean;
   lastEventAt: number | null;
 };
 
+const SAMPLE = { count: demoCount, gems: demoGems, intros: demoIntros, speakers: demoSpeakers };
+
 export function useVouchData(demo: boolean): VouchData & { refetch: () => void } {
+  const useSample = demo || !supabase;
   const [state, setState] = useState<VouchData>({
-    count: demo ? demoCount : null,
-    gems: demo ? demoGems : [],
-    intros: demo ? demoIntros : [],
-    speakers: demo ? demoSpeakers : [],
-    loading: !demo,
+    ...(useSample ? SAMPLE : { count: null, gems: [], intros: [], speakers: [] }),
+    loading: !useSample,
     error: null,
     live: false,
+    fallback: useSample,
     lastEventAt: null,
   });
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchAll = useCallback(async () => {
     if (demo || !supabase) return;
-    const [c, g, i, s] = await Promise.all([
-      supabase.from("members").select("id", { count: "exact", head: true }).eq("consent", true),
-      supabase.from("hidden_gems").select("*"),
-      supabase.from("intros").select("*"),
-      supabase.from("speakers").select("*"),
-    ]);
-    const err = c.error || g.error || i.error || s.error;
-    setState((prev) => ({
-      ...prev,
-      count: c.count ?? prev.count ?? 0,
-      gems: (g.data as HiddenGem[]) ?? prev.gems,
-      intros: (i.data as Intro[]) ?? prev.intros,
-      speakers: (s.data as Speaker[]) ?? prev.speakers,
-      loading: false,
-      error: err ? err.message : null,
-    }));
+    try {
+      const [c, g, i, s] = await Promise.all([
+        supabase.from("builders").select("id", { count: "exact", head: true }),
+        supabase.from("builder_gems").select("*"),
+        supabase.from("builder_intros").select("*"),
+        supabase.from("builder_speakers").select("*"),
+      ]);
+      const err = c.error || g.error || i.error || s.error;
+      const gems = (g.data as HiddenGem[] | null) ?? [];
+      const intros = (i.data as Intro[] | null) ?? [];
+      const speakers = (s.data as Speaker[] | null) ?? [];
+      const empty = !c.count || (gems.length + intros.length + speakers.length === 0);
+      if (err || empty) {
+        setState((p) => ({ ...p, ...SAMPLE, loading: false, fallback: true, error: err ? err.message : null }));
+        return;
+      }
+      setState((p) => ({ ...p, count: c.count ?? 0, gems, intros, speakers, loading: false, fallback: false, error: null }));
+    } catch (e) {
+      setState((p) => ({ ...p, ...SAMPLE, loading: false, fallback: true, error: e instanceof Error ? e.message : "fetch failed" }));
+    }
   }, [demo]);
 
   useEffect(() => {
-    if (demo) return;
-    if (!supabase) {
-      setState((p) => ({ ...p, loading: false, error: "Supabase env vars missing (NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY)." }));
-      return;
-    }
+    if (demo || !supabase) return;
     fetchAll();
     const client = supabase;
     const channel = client
-      .channel("vouch-members")
-      .on("postgres_changes", { event: "*", schema: "public", table: "members" }, (payload) => {
-        // Optimistic bump on consented inserts so the counter moves instantly.
-        if (payload.eventType === "INSERT" && (payload.new as { consent?: boolean })?.consent) {
-          setState((p) => ({ ...p, count: (p.count ?? 0) + 1, lastEventAt: Date.now() }));
-        } else {
-          setState((p) => ({ ...p, lastEventAt: Date.now() }));
-        }
-        // Debounced refetch: research summaries arrive later via UPDATE.
+      .channel("vouch-builders")
+      .on("postgres_changes", { event: "*", schema: "public", table: "builders" }, () => {
+        setState((p) => ({ ...p, lastEventAt: Date.now() }));
         if (timer.current) clearTimeout(timer.current);
         timer.current = setTimeout(fetchAll, 600);
       })

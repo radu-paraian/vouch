@@ -17,3 +17,9 @@ export const ArrowCircleIcon = ({ size = 14 }: P) => (
 export const ChevronIcon = ({ size = 14 }: P) => (
   <svg {...base(size)} stroke="rgba(0,0,0,0.6)" strokeWidth={2}><path d="M6 9l6 6 6-6" /></svg>
 );
+export const CopyIcon = ({ size = 14 }: P) => (
+  <svg {...base(size)} strokeWidth={2}><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15V6a2 2 0 0 1 2-2h9" /></svg>
+);
+export const CheckIcon = ({ size = 14 }: P) => (
+  <svg {...base(size)} strokeWidth={2}><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+);

@@ -45,7 +45,7 @@ export default function Dashboard({ demo = false, initialTab = "gems" }: { demo?
             <div className="flex items-baseline gap-[16px]">
               <h1 className="v-display text-[36px] leading-[1]">Vouch</h1>
             </div>
-            {!demo && (
+            {!d.fallback && (
               <span className="v-chip !text-[12px]">
                 <span className="v-live-dot" style={d.live ? undefined : { background: "#a7a7a7", animation: "none" }} />
                 {d.live ? "Live" : "Connecting"}
@@ -77,8 +77,11 @@ export default function Dashboard({ demo = false, initialTab = "gems" }: { demo?
                     <span className="text-[42px] leading-[1.1]">{d.loading ? "–" : <AnimatedNumber value={counts[t.id]} />}</span>
                     <span className="text-[24px] v-muted">{t.unit}</span>
                   </div>
-                  <div className="v-track">
-                    <motion.div className="v-fill" initial={{ width: 0 }} animate={{ width: `${Math.min(100, (counts[t.id] / total) * 100)}%` }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }} />
+                  <div className="flex flex-col gap-[6px]">
+                    <div className="v-track">
+                      <motion.div className="v-fill" initial={{ width: 0 }} animate={{ width: `${Math.min(100, (counts[t.id] / total) * 100)}%` }} transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }} />
+                    </div>
+                    <span className="text-[11px] v-muted">of {d.count ?? 0} builders</span>
                   </div>
                 </div>
               ))}
@@ -112,10 +115,10 @@ export default function Dashboard({ demo = false, initialTab = "gems" }: { demo?
                       <EmptyState text="No intros yet." />
                     ) : (
                       <motion.div variants={listVariants} initial="hidden" animate="show" className={grid}>
-                        {d.intros.map((i) => <IntroCard key={`${i.seeker_id}-${i.match_id}`} i={i} />)}
+                        {d.intros.map((i) => <IntroCard key={`${i.a_id}-${i.b_id}`} i={i} />)}
                       </motion.div>
                     )}
-                    <InvitesPanel demo={demo} refreshKey={d.lastEventAt ?? 0} />
+                    <InvitesPanel demo={demo || d.fallback} refreshKey={d.lastEventAt ?? 0} />
                   </div>
                 )}
                 {tab === "speakers" && (d.loading ? <SkeletonGrid /> : d.speakers.length === 0 ? (

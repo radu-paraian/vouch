@@ -1,21 +1,31 @@
 export const COMMUNITIES = [
   "Unicorn Mafia", "basedcollective", "Kickstart Global", "Hackradar", "AI Agents Lab", "Corgi Community",
-  "Night Office", "The Hack Collective", "United Italian Societies", "Outpost", "AI Pilled", "Imperial Entrepreneurs", "Other",
+  "Night Office", "The Hack Collective", "United Italian Societies", "Outpost", "AI Pilled", "Imperial Entrepreneurs",
+  "Hacker News", "Qloo Agentic Hackathon", "Build, Ship, Shape: Amazon Developer Hackathon", "Nebius x NVIDIA Global AI Hackathon",
 ] as const;
 
-export type HiddenGem = {
-  id: string; name: string; github: string | null; communities: string[] | null; skills: string[] | null;
-  events_last_3_months: number | null; shipped_count: number | null; research_summary: string | null; why: string | null;
+export type Evidence = { label: string; url: string };
+
+/** Row shape of builder_gems / builder_speakers (public.builders + why). */
+export type Builder = {
+  id: string; name: string; handle: string | null; source: string; source_url: string | null; github: string | null;
+  skills: string[] | null; languages: string[] | null; shipped_count: number | null; followers: number | null;
+  evidence: Evidence[] | null; summary: string | null; communities: string[] | null; why: string | null;
+  speaker_evidence?: string | null;
 };
+export type HiddenGem = Builder;
+export type Speaker = Builder;
+
+/** Row shape of builder_intros. */
 export type Intro = {
-  seeker_id: string; seeker_name: string; looking_for: string | null; match_id: string; match_name: string;
-  match_skills: string[] | null; match_communities: string[] | null; matched_skill: string | null; why: string | null;
+  a_id: string; a_name: string; a_handle: string | null; a_source: string; a_url: string | null;
+  b_id: string; b_name: string; b_handle: string | null; b_source: string; b_url: string | null;
+  shared: string[] | null; overlap: number | null; why: string | null;
+  a_communities: string[] | null; b_communities: string[] | null; b_skills: string[] | null;
 };
-export type Speaker = {
-  id: string; name: string; github: string | null; communities: string[] | null; skills: string[] | null;
-  talk_topic: string | null; shipped_count: number | null; research_summary: string | null; why: string | null;
-};
+
+/** Row shape of builder_invites(target). */
 export type Invite = {
-  id: string; name: string; github: string | null; skills: string[] | null; communities: string[] | null;
-  overlap: number | null; research_summary: string | null; why: string | null;
+  id: string; name: string; handle: string | null; source: string; source_url: string | null; github: string | null;
+  skills: string[] | null; communities: string[] | null; shipped_count: number | null; overlap: number | null; why: string | null;
 };
