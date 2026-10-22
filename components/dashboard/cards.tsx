@@ -31,7 +31,7 @@ export const inviteMessage = (v: Invite, community: string) =>
 
 function CardShell({ children }: { children: React.ReactNode }) {
   return (
-    <motion.article layout variants={itemVariants} whileHover={{ y: -3 }} className="v-card p-[10px]">
+    <motion.article variants={itemVariants} whileHover={{ y: -3 }} className="v-card p-[10px]">
       <div className="flex flex-col gap-[16px] px-[15px] pt-[12px] pb-[8px] h-full">{children}</div>
     </motion.article>
   );
@@ -49,7 +49,7 @@ function Person({ name, handle }: { name: string; handle?: string | null }) {
   );
 }
 
-function BigNumber({ n, unit }: { n?: number | null; unit: string }) {
+function BigNumber({ n, unit }: { n?: number | string | null; unit: string }) {
   return (
     <div className="flex flex-col items-end shrink-0">
       <span className="text-[36px] leading-[1]">{n ?? 0}</span>
@@ -58,7 +58,7 @@ function BigNumber({ n, unit }: { n?: number | null; unit: string }) {
   );
 }
 
-function PersonCard({ b, n, unit, line, action }: { b: Builder | Invite; n?: number | null; unit: string; line?: string | null; action?: React.ReactNode }) {
+function PersonCard({ b, n, unit, line, action }: { b: Builder | Invite; n?: number | string | null; unit: string; line?: string | null; action?: React.ReactNode }) {
   return (
     <CardShell>
       <div className="flex items-start justify-between gap-[10px]">
@@ -77,14 +77,16 @@ function PersonCard({ b, n, unit, line, action }: { b: Builder | Invite; n?: num
   );
 }
 
-const summaryLine = (b: Builder) => b.why || b.summary;
+const summaryLine = (b: Builder) => (b.why || b.summary || "").replace(/,\s*\d+ followers$/, "");
 
 export const GemCard = ({ g }: { g: Builder }) => (
   <PersonCard b={g} n={g.shipped_count} unit="shipped" line={summaryLine(g)} />
 );
 
+const compact = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : String(n));
+
 export const SpeakerCard = ({ s }: { s: Builder }) => (
-  <PersonCard b={s} n={s.shipped_count} unit="shipped" line={summaryLine(s)}
+  <PersonCard b={s} n={s.stat_value != null ? compact(s.stat_value) : s.shipped_count} unit={s.stat_label || "shipped"} line={summaryLine(s)}
     action={<CopyButton label="Invite to speak" text={speakerMessage(s)} />} />
 );
 

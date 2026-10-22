@@ -48,6 +48,29 @@ export function SourceLink({ source, url, github }: { source?: string | null; ur
   );
 }
 
+/** Copy to clipboard: async Clipboard API, falling back to a hidden textarea + execCommand. */
+export async function copyText(text: string): Promise<boolean> {
+  try {
+    if (typeof navigator !== "undefined" && navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch { /* denied or unavailable: fall through */ }
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed"; ta.style.top = "0"; ta.style.left = "-9999px"; ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select(); ta.setSelectionRange(0, text.length);
+    const ok = document.execCommand("copy");
+    ta.remove();
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
 /** Primary button that copies a ready message and briefly shows "Copied". */
 export function CopyButton({ label, text }: { label: string; text: string }) {
   const [copied, setCopied] = useState(false);
@@ -57,14 +80,8 @@ export function CopyButton({ label, text }: { label: string; text: string }) {
     return () => clearTimeout(t);
   }, [copied]);
   const onClick = async () => {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      const ta = document.createElement("textarea");
-      ta.value = text; document.body.appendChild(ta); ta.select();
-      try { document.execCommand("copy"); } finally { ta.remove(); }
-    }
-    setCopied(true);
+    if (await copyText(text)) setCopied(true);
+    return;
   };
   return (
     <button type="button" className="v-btn-primary" onClick={onClick} title={text} aria-live="polite">
@@ -114,7 +131,7 @@ export function EmptyState({ text }: { text: string }) {
   );
 }
 
-export const listVariants = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } };
+export const listVariants = { hidden: {}, show: { transition: { staggerChildren: 0.03 } } };
 export const itemVariants = {
   hidden: { opacity: 0, y: 14, scale: 0.98 },
   show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 260, damping: 26 } },

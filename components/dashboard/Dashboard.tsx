@@ -1,6 +1,6 @@
 "use client";
 import "./dashboard.css";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState, type ComponentType } from "react";
 import { GemCard, IntroCard, SpeakerCard } from "./cards";
 import { instrumentSans, instrumentSerif } from "./fonts";
@@ -19,7 +19,17 @@ const TABS: { id: TabId; Icon: ComponentType<{ size?: number }>; label: string; 
 const grid = "grid gap-[15px] grid-cols-1 md:grid-cols-2 xl:grid-cols-3";
 
 export default function Dashboard({ demo = false, initialTab = "gems", initialQuestion = "" }: { demo?: boolean; initialTab?: TabId; initialQuestion?: string }) {
-  const [tab, setTab] = useState<TabId>(initialTab);
+  const [tab, setTabState] = useState<TabId>(initialTab);
+  // Instant, state-driven tab switch; keeps ?tab in the URL without a router navigation.
+  const setTab = (id: TabId) => {
+    setTabState(id);
+    try {
+      const url = new URL(window.location.href);
+      if (id === "gems") url.searchParams.delete("tab"); else url.searchParams.set("tab", id);
+      url.searchParams.delete("q");
+      window.history.replaceState(window.history.state, "", url.toString());
+    } catch { /* ignore */ }
+  };
   const d = useVouchData(demo);
   const counts: Record<TabId, number> = { gems: d.gems.length, intros: d.intros.length, speakers: d.speakers.length };
   const total = Math.max(d.count ?? 0, 1);
@@ -103,8 +113,7 @@ export default function Dashboard({ demo = false, initialTab = "gems", initialQu
           </nav>
 
           <section className="flex-1">
-            <AnimatePresence mode="wait">
-              <motion.div key={tab} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }}>
+            <motion.div key={tab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.12 }}>
                 {tab === "gems" && (d.loading ? <SkeletonGrid /> : d.gems.length === 0 ? (
                   <EmptyState text="No hidden gems yet." />
                 ) : (
@@ -131,8 +140,7 @@ export default function Dashboard({ demo = false, initialTab = "gems", initialQu
                     {d.speakers.map((s) => <SpeakerCard key={s.id} s={s} />)}
                   </motion.div>
                 ))}
-              </motion.div>
-            </AnimatePresence>
+            </motion.div>
           </section>
 
         </main>

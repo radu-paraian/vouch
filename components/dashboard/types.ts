@@ -12,6 +12,8 @@ export type Builder = {
   skills: string[] | null; languages: string[] | null; shipped_count: number | null; followers: number | null;
   evidence: Evidence[] | null; summary: string | null; communities: string[] | null; why: string | null;
   speaker_evidence?: string | null;
+  /** builder_speakers only: source-appropriate headline number (HN points, events hosted, followers). */
+  stat_value?: number | null; stat_label?: string | null;
 };
 export type HiddenGem = Builder;
 export type Speaker = Builder;

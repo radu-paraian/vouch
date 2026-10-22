@@ -7,5 +7,5 @@ export default function Page({ searchParams }: { searchParams: { [k: string]: st
   const t = searchParams.tab;
   const initialTab = t === "intros" || t === "speakers" ? t : "gems";
   const q = typeof searchParams.q === "string" ? searchParams.q.slice(0, 300) : "";
-  return <Dashboard key={`${demo}-${initialTab}`} demo={demo} initialTab={initialTab} initialQuestion={q} />;
+  return <Dashboard key={demo ? "demo" : "live"} demo={demo} initialTab={initialTab} initialQuestion={q} />;
 }

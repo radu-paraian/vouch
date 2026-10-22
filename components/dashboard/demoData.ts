@@ -10,11 +10,11 @@ const b = (o: Partial<HiddenGem> & Pick<HiddenGem, "id" | "name" | "source">): H
 
 export const demoGems: HiddenGem[] = [
   b({ id: "g1", name: "Amara Okafor", source: "github", github: "amaraokafor", source_url: "https://github.com/amaraokafor",
-    skills: ["Rust", "WebGPU"], shipped_count: 14, followers: 41, communities: ["AI Agents Lab", "Night Office"], why: "Shipped 14 projects, 41 followers" }),
+    skills: ["Rust", "WebGPU"], shipped_count: 14, followers: 41, communities: ["AI Agents Lab", "Night Office"], why: "Shipped 14 projects, mostly Rust" }),
   b({ id: "g2", name: "Tomasz Wisniewski", source: "devpost", source_url: "https://devpost.com/tomwis",
-    skills: ["TypeScript", "Postgres"], shipped_count: 9, followers: 12, communities: ["Qloo Agentic Hackathon"], why: "Shipped 9 projects, 12 followers" }),
+    skills: ["TypeScript", "Postgres"], shipped_count: 9, followers: 12, communities: ["Qloo Agentic Hackathon"], why: "Shipped 9 projects, mostly TypeScript" }),
   b({ id: "g3", name: "Priya Raman", source: "hn", source_url: "https://news.ycombinator.com/user?id=priyaraman",
-    skills: ["Python", "Evals"], shipped_count: 7, followers: 3, communities: ["Hacker News"], why: "Shipped 7 projects, 3 followers" }),
+    skills: ["Python", "Evals"], shipped_count: 7, followers: 3, communities: ["Hacker News"], why: "Shipped 7 projects, mostly Python" }),
 ];
 
 export const demoIntros: Intro[] = [
@@ -30,9 +30,9 @@ export const demoIntros: Intro[] = [
 
 export const demoSpeakers: Speaker[] = [
   b({ id: "p1", name: "Hannah Cole", source: "luma", source_url: "https://lu.ma/user/hannahcole", skills: ["Agents", "Voice"],
-    shipped_count: 11, communities: ["Agentic AI in Financial Services"], why: "Hosted Voice agents in production" }),
+    shipped_count: 11, communities: ["Agentic AI in Financial Services"], why: "Hosted Voice agents in production", stat_value: 1, stat_label: "event hosted" }),
   b({ id: "p2", name: "Ravi Patel", source: "devpost", source_url: "https://devpost.com/ravipatel", skills: ["Infra", "Go"],
-    shipped_count: 8, communities: ["Nebius x NVIDIA Global AI Hackathon"], why: "Devpost winner" }),
+    shipped_count: 8, communities: ["Nebius x NVIDIA Global AI Hackathon"], why: "Shipped 8 projects", stat_value: 8, stat_label: "shipped" }),
 ];
 
 export const demoInvites = (community: string): Invite[] => [
