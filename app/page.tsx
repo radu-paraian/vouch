@@ -1,29 +1,10 @@
-import Link from "next/link";
+import Dashboard from "@/components/dashboard/Dashboard";
 
-export default function Home() {
-  return (
-    <main className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
-      <p className="text-xs uppercase tracking-[0.28em] text-gold">Vouch</p>
-      <h1 className="mt-6 max-w-xl font-serif text-5xl leading-tight text-paper">
-        One shared memory of London builders.
-      </h1>
-      <p className="mt-4 max-w-md text-mute">
-        Dashboard tabs land next. Join now — it takes 30 seconds.
-      </p>
-      <div className="mt-10 flex gap-4">
-        <Link
-          href="/join"
-          className="rounded-full bg-paper px-6 py-3 text-sm font-medium text-ink transition-transform active:scale-[0.97]"
-        >
-          Join Vouch
-        </Link>
-        <Link
-          href="/qr"
-          className="rounded-full border border-line px-6 py-3 text-sm text-paper transition-transform active:scale-[0.97]"
-        >
-          Screen QR
-        </Link>
-      </div>
-    </main>
-  );
+// Route "/". ?demo=1 renders labelled sample data without touching Supabase.
+// ?tab=intros|speakers optionally opens a tab (handy for screenshots).
+export default function Page({ searchParams }: { searchParams: { [k: string]: string | string[] | undefined } }) {
+  const demo = searchParams.demo === "1";
+  const t = searchParams.tab;
+  const initialTab = t === "intros" || t === "speakers" ? t : "gems";
+  return <Dashboard key={`${demo}-${initialTab}`} demo={demo} initialTab={initialTab} />;
 }

@@ -1,0 +1,150 @@
+/* Vouch dashboard tokens (from Figma "Vault"). Scoped to .vouch so it never touches globals. */
+.vouch {
+  --v-canvas: #eceaea;
+  --v-shell: #ffffff;
+  --v-panel: #f7f7f7;
+  --v-surface: #ffffff;
+  --v-tile: #f7f7f7;
+  --v-badge: #f4f4f4;
+  --v-track: #dcdbdb;
+  --v-bar-muted: #dcdcdc;
+  --v-ink: #000000;
+  --v-ink-90: rgba(0, 0, 0, 0.9);
+  --v-ink-60: rgba(0, 0, 0, 0.6);
+  --v-line: rgba(0, 0, 0, 0.1);
+  --v-line-strong: rgba(0, 0, 0, 0.6);
+  --v-placeholder: #a7a7a7;
+  --v-charcoal: #353535;
+  --v-shadow-shell: 0px 4px 18.6px 0px rgba(0, 0, 0, 0.18);
+  --v-shadow-panel: 0px 4px 11.4px 0px rgba(0, 0, 0, 0.18);
+  --v-shadow-rail: 1px 3px 11.8px 1px rgba(0, 0, 0, 0.4);
+  --v-shadow-rail-btn: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+
+  background: var(--v-canvas);
+  color: var(--v-ink);
+  font-family: var(--v-font-sans), "Instrument Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+.vouch * { box-sizing: border-box; }
+.vouch .v-display { font-family: var(--v-font-display), "Instrument Serif", Georgia, serif; font-weight: 400; }
+.vouch .v-muted { color: var(--v-ink-60); }
+
+/* Shell + panel */
+.vouch .v-shell { background: var(--v-shell); border-radius: 15px; box-shadow: var(--v-shadow-shell); }
+.vouch .v-panel { background: var(--v-panel); border-radius: 15px; box-shadow: var(--v-shadow-panel); }
+.vouch .v-rail {
+  background: var(--v-charcoal);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top-width: 2px;
+  border-radius: 8px;
+  box-shadow: var(--v-shadow-rail);
+}
+.vouch .v-rail-btn {
+  border-radius: 5px; color: rgba(255,255,255,0.75); transition: background .2s, color .2s;
+}
+.vouch .v-rail-btn[data-active="true"] {
+  background: #fff; color: var(--v-ink); border: 1px solid rgba(57,57,57,0.1); box-shadow: var(--v-shadow-rail-btn);
+}
+
+/* Outlined stat card (1.5px line, 25px radius) */
+.vouch .v-outline { border: 1.5px solid var(--v-line); border-radius: 25px; }
+.vouch .v-outline-15 { border: 1.5px solid var(--v-line); border-radius: 15px; }
+
+/* Raised white card (Invoice preview style) */
+.vouch .v-card {
+  background: var(--v-surface);
+  border: 1px solid var(--v-line);
+  border-top: 2px solid var(--v-panel);
+  border-radius: 25px;
+}
+/* Inner tile (milestone tile style) */
+.vouch .v-tile {
+  background: var(--v-tile);
+  border: 1px solid var(--v-line);
+  border-top: 2px solid #fff;
+  border-radius: 15px;
+}
+
+/* Chips / pills */
+.vouch .v-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 8px 12px; border: 1px solid var(--v-line); border-radius: 25px;
+  font-size: 10px; font-weight: 500; line-height: normal; color: var(--v-ink-60); white-space: nowrap;
+}
+.vouch .v-badge {
+  display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 15px;
+  background: var(--v-badge); font-size: 10px; font-weight: 500; color: var(--v-ink-60); white-space: nowrap;
+}
+.vouch .v-status {
+  display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 15px;
+  border: 1px solid var(--v-line-strong); font-size: 10px; color: var(--v-ink-60); white-space: nowrap;
+}
+.vouch .v-count {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 15px; height: 15px; padding: 0 3px;
+  border: 1px solid var(--v-line-strong); border-radius: 100px; font-size: 10px; font-weight: 500; color: var(--v-ink-60);
+}
+
+/* Tabs = filter chips; active = white raised chip */
+.vouch .v-tab {
+  position: relative; display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 16px; border: 1px solid var(--v-line); border-radius: 25px;
+  font-size: 14px; font-weight: 500; color: var(--v-ink-60); background: transparent; cursor: pointer;
+  transition: color .2s;
+}
+.vouch .v-tab[data-active="true"] { color: var(--v-ink); }
+.vouch .v-tab-pill {
+  position: absolute; inset: -1px; border-radius: 25px; background: #fff; border-top: 1px solid var(--v-panel);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+/* Buttons */
+.vouch .v-btn-primary {
+  display: inline-flex; align-items: center; gap: 5px; border: 1px solid #000; border-radius: 25px; overflow: hidden;
+}
+.vouch .v-btn-primary > span {
+  display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 25px;
+  background: linear-gradient(180deg, #3b3c40 0%, #1d1e22 100%); border-top: 2px solid #5c5d61;
+  color: #fff; font-size: 12px; font-weight: 500; white-space: nowrap; transition: filter .2s;
+}
+.vouch .v-btn-primary:hover > span { filter: brightness(1.25); }
+.vouch .v-btn-secondary {
+  display: inline-flex; align-items: center; gap: 5px; padding: 8px 12px; border: 1px solid rgba(57,57,57,0.1);
+  border-radius: 25px; font-size: 10px; font-weight: 500; color: var(--v-ink-60); background: transparent; transition: background .2s, color .2s;
+}
+.vouch .v-btn-secondary:hover { background: #fff; color: var(--v-ink); }
+
+/* Select (input style: #f4f4f4 border, 25px radius, #a7a7a7 placeholder) */
+.vouch .v-select {
+  appearance: none; background: #fff; border: 1px solid var(--v-line); border-radius: 25px;
+  padding: 10px 40px 10px 16px; font-size: 14px; font-weight: 500; color: var(--v-ink); cursor: pointer;
+  font-family: inherit;
+}
+.vouch .v-select:focus { outline: none; border-color: var(--v-line-strong); }
+
+/* Progress */
+.vouch .v-track { background: var(--v-track); border-radius: 15px; height: 12px; overflow: hidden; }
+.vouch .v-fill { background: var(--v-charcoal); height: 100%; }
+
+/* Avatar circle */
+.vouch .v-avatar {
+  display: inline-flex; align-items: center; justify-content: center; border-radius: 100px;
+  background: var(--v-line); color: var(--v-ink-60); font-weight: 500; flex-shrink: 0;
+}
+
+/* Skeleton shimmer */
+.vouch .v-skel { position: relative; overflow: hidden; background: #efefef; border-radius: 10px; }
+.vouch .v-skel::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.75), transparent);
+  transform: translateX(-100%); animation: v-shimmer 1.4s infinite;
+}
+@keyframes v-shimmer { to { transform: translateX(100%); } }
+
+.vouch .v-live-dot { width: 8px; height: 8px; border-radius: 100px; background: #22a06b; box-shadow: 0 0 0 0 rgba(34,160,107,.5); animation: v-pulse 2s infinite; }
+@keyframes v-pulse { 0% { box-shadow: 0 0 0 0 rgba(34,160,107,.5);} 70% { box-shadow: 0 0 0 8px rgba(34,160,107,0);} 100% { box-shadow: 0 0 0 0 rgba(34,160,107,0);} }
+
+.vouch a.v-link { color: var(--v-ink-60); text-decoration: none; transition: color .2s; }
+.vouch a.v-link:hover { color: var(--v-ink); }
+
+.vouch .v-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }

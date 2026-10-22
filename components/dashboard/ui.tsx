@@ -1,0 +1,78 @@
+"use client";
+import { animate, motion, useMotionValue, useTransform } from "framer-motion";
+import { useEffect } from "react";
+import { ArrowCircleIcon } from "./icons";
+
+export function AnimatedNumber({ value }: { value: number }) {
+  const mv = useMotionValue(0);
+  const rounded = useTransform(mv, (v) => Math.round(v).toLocaleString("en-GB"));
+  useEffect(() => {
+    const c = animate(mv, value, { duration: 1.1, ease: [0.22, 1, 0.36, 1] });
+    return c.stop;
+  }, [mv, value]);
+  return <motion.span>{rounded}</motion.span>;
+}
+
+export function initials(name: string) {
+  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("");
+}
+
+export function Avatar({ name, size = 40 }: { name: string; size?: number }) {
+  return (
+    <span className="v-avatar" style={{ width: size, height: size, fontSize: size * 0.36 }}>{initials(name)}</span>
+  );
+}
+
+export const cleanHandle = (h: string) => h.replace(/^@/, "").replace(/^https?:\/\/github\.com\//, "").replace(/\/$/, "");
+
+/** The single plain-English reason, clamped to 2 lines. */
+export function Reason({ text }: { text?: string | null }) {
+  return (
+    <p className="text-[16px] leading-[1.35] v-clamp-2" style={{ color: "var(--v-ink-90)" }} title={text ?? undefined}>
+      {text || "Still being researched."}
+    </p>
+  );
+}
+
+export function GithubLink({ handle }: { handle?: string | null }) {
+  if (!handle) return null;
+  return (
+    <a className="v-btn-primary" href={`https://github.com/${cleanHandle(handle)}`} target="_blank" rel="noreferrer">
+      <span>GitHub <ArrowCircleIcon /></span>
+    </a>
+  );
+}
+
+export function SkeletonGrid({ n = 3 }: { n?: number }) {
+  return (
+    <div className="grid gap-[15px] grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+      {Array.from({ length: n }).map((_, i) => (
+        <div key={i} className="v-card p-[25px] flex flex-col gap-[14px]">
+          <div className="flex items-center gap-[10px]">
+            <div className="v-skel" style={{ width: 40, height: 40, borderRadius: 100 }} />
+            <div className="flex flex-col gap-[6px] flex-1">
+              <div className="v-skel h-[16px] w-[55%]" />
+              <div className="v-skel h-[10px] w-[30%]" />
+            </div>
+          </div>
+          <div className="v-skel h-[14px] w-[85%]" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function EmptyState({ text }: { text: string }) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      className="v-card flex items-center justify-center text-center px-[52px] py-[56px]">
+      <p className="v-display text-[32px] leading-[1.1] v-muted">{text}</p>
+    </motion.div>
+  );
+}
+
+export const listVariants = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } };
+export const itemVariants = {
+  hidden: { opacity: 0, y: 14, scale: 0.98 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 260, damping: 26 } },
+};
