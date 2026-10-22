@@ -1,5 +1,3 @@
-import { spawn } from "node:child_process";
-import path from "node:path";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -12,35 +10,46 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "question is required" }, { status: 400 });
   }
 
-  const script = path.join(process.cwd(), "cognee", "ask.py");
-
-  try {
-    const answer = await runAsk(script, question);
-    return NextResponse.json({ answer });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Ask Vouch failed";
-    return NextResponse.json({ error: message }, { status: 500 });
+  const base = process.env.COGNEE_SERVICE_URL?.replace(/\/$/, "");
+  const key = process.env.COGNEE_API_KEY;
+  if (!base || !key) {
+    return NextResponse.json({ error: "Cognee is not configured" }, { status: 500 });
   }
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    "X-Api-Key": key,
+  };
+  if (process.env.COGNEE_TENANT_ID) headers["X-Tenant-Id"] = process.env.COGNEE_TENANT_ID;
+
+  const response = await fetch(`${base}/api/v1/search`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      query: question,
+      search_type: "GRAPH_COMPLETION",
+      datasets: ["vouch"],
+    }),
+  });
+  const payload = await response.json().catch(() => null);
+  if (!response.ok) {
+    const message = typeof payload?.detail === "string" ? payload.detail : "Cognee search failed";
+    return NextResponse.json({ error: message }, { status: response.status });
+  }
+
+  return NextResponse.json({ answer: answerText(payload) });
 }
 
-function runAsk(script: string, question: string) {
-  return new Promise<string>((resolve, reject) => {
-    const child = spawn("python3", [script, question], {
-      cwd: process.cwd(),
-      env: process.env,
-    });
-    let stdout = "";
-    let stderr = "";
-    child.stdout.on("data", (chunk) => {
-      stdout += chunk;
-    });
-    child.stderr.on("data", (chunk) => {
-      stderr += chunk;
-    });
-    child.on("error", reject);
-    child.on("close", (code) => {
-      if (code === 0) resolve(stdout.trim());
-      else reject(new Error(stderr.trim() || `ask.py exited ${code}`));
-    });
-  });
+function answerText(payload: unknown): string {
+  if (typeof payload === "string") return payload;
+  if (Array.isArray(payload)) return payload.map(answerText).filter(Boolean).join("\n");
+  if (payload && typeof payload === "object") {
+    const record = payload as Record<string, unknown>;
+    for (const key of ["search_result", "answer", "text"]) {
+      const value = record[key];
+      if (typeof value === "string" && value.trim()) return value.trim();
+      if (Array.isArray(value)) return answerText(value);
+    }
+  }
+  return "";
 }

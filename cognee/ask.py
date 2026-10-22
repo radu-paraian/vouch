@@ -6,14 +6,11 @@
 import asyncio
 import sys
 
-from common import DATASET, flatten_search, load_env
+from common import flatten_search, load_env, search
 
 
 async def ask(question):
-    import cognee
-
-    results = await cognee.search(question, datasets=[DATASET])
-    return flatten_search(results)
+    return flatten_search(search(question))
 
 
 def main():

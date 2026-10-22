@@ -10,7 +10,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from common import DATASET, load_env, member_text, supabase_credentials
+from common import add_text, cognify, load_env, member_text, supabase_credentials
 
 STATE_PATH = Path(__file__).resolve().parent / ".sync-state.json"
 
@@ -35,8 +35,6 @@ def save_state(state):
 
 
 async def sync():
-    import cognee
-
     rows = fetch_members()
     state = load_state()
     changed = []
@@ -52,9 +50,9 @@ async def sync():
         print(f"no changes ({len(rows)} members)")
         return
 
-    for _member_id, _digest, text in changed:
-        await cognee.add(text, dataset_name=DATASET)
-    await cognee.cognify(datasets=[DATASET])
+    for member_id, _digest, text in changed:
+        add_text(text, f"{member_id}.txt")
+    cognify()
 
     for member_id, digest, _text in changed:
         state[member_id] = digest
