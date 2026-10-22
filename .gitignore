@@ -2,3 +2,5 @@
 .env
 .env.local
 .env*.local
+.cognee/
+cognee/.sync-state.json
